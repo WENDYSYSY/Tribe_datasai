@@ -1,0 +1,12 @@
+#---------------------------
+# Permissions Cloud Build
+#---------------------------
+
+gcloud projects add-iam-policy-binding "PROJECT_ID à Renseigner" --member="serviceAccount:"ACCOUNT_ID à Renseigner"@cloudbuild.gserviceaccount.com" --role="roles/storage.objectAdmin"
+
+#--------------------------
+#Permissions compte compute
+#--------------------------
+
+gcloud projects add-iam-policy-binding "PROJECT_ID à Renseigner" --member="serviceAccount:"ACCOUNT_ID à Renseigner"-compute@developer.gserviceaccount.com" --role="roles/storage.objectAdmin"
+
