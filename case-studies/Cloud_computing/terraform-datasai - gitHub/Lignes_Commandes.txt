@@ -1,0 +1,21 @@
+#---------------------------------------------
+#Les lignes de commandes à exécuter
+#---------------------------------------------
+
+#Initialisation
+powershellterraform init
+
+#Prévisualiser
+powershellterraform plan -var-file="secret.tfvars"
+
+#Déployer
+powershellterraform apply -var-file="secret.tfvars"
+
+#Vérifier ce qui a été créé
+powershellterraform show
+
+#Voir les outputs
+powershellterraform output
+
+#Détruire
+powershellterraform destroy -var-file="secret.tfvars"
