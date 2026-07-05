@@ -1,0 +1,106 @@
+-- ═══════════════════════════════════════════════════════════
+-- DATASAI — Semaine 2, Jour 4
+-- BigQuery — NYC Citi Bike Trips
+-- 58+ millions de trajets réels depuis 2013
+-- Source : cloud.google.com/bigquery/docs
+-- datasai.fr
+-- ═══════════════════════════════════════════════════════════
+
+-- ── REQUÊTE 1 : Aperçu complet ───────────────────────────
+-- SELECT * = sélectionner toutes les colonnes
+-- LIMIT 100 = afficher seulement 100 lignes
+-- Toujours utiliser LIMIT pour éviter de scanner toute la table
+SELECT *
+FROM `bigquery-public-data.new_york_citibike.citibike_trips`
+LIMIT 100;
+
+
+-- ── REQUÊTE 2 : Filtrer les valeurs NULL ─────────────────
+-- WHERE tripduration IS NOT NULL = exclure les lignes sans durée
+-- En data réelle, les valeurs manquantes sont très fréquentes
+-- Toujours filtrer les NULL avant toute analyse
+SELECT *
+FROM `bigquery-public-data.new_york_citibike.citibike_trips`
+WHERE tripduration IS NOT NULL
+LIMIT 100;
+
+
+-- ── REQUÊTE 3 : Sélectionner les colonnes utiles ─────────
+-- Bonne pratique : ne jamais faire SELECT * en production
+-- BigQuery facture par données scannées
+-- Sélectionner uniquement les colonnes nécessaires = moins cher
+-- tripduration     = durée du trajet en secondes
+-- starttime        = heure de départ
+-- start_station_name = station de départ
+-- end_station_name   = station d'arrivée
+-- usertype         = Subscriber (abonné) ou Customer (ponctuel)
+SELECT
+  tripduration,
+  starttime,
+  start_station_name,
+  end_station_name,
+  usertype
+FROM `bigquery-public-data.new_york_citibike.citibike_trips`
+WHERE tripduration IS NOT NULL
+AND   start_station_name IS NOT NULL
+AND   starttime IS NOT NULL
+LIMIT 100;
+
+
+-- ── REQUÊTE 4 : Nombre total de trajets ──────────────────
+-- COUNT(*) = compter toutes les lignes de la table
+-- AS total_trajets = nommer la colonne résultat
+-- Résultat attendu : environ 58 millions de lignes
+SELECT
+  COUNT(*) AS total_trajets
+FROM `bigquery-public-data.new_york_citibike.citibike_trips`;
+
+
+-- ── REQUÊTE 5 : Top 100 stations les plus populaires ─────
+-- GROUP BY = regrouper les lignes par valeur unique de la colonne
+-- COUNT(*) = compter les trajets dans chaque groupe
+-- ORDER BY nombre_trajets DESC = trier du plus grand au plus petit
+-- DESC = descendant | ASC = ascendant
+SELECT
+  start_station_name,
+  COUNT(*) AS nombre_trajets
+FROM `bigquery-public-data.new_york_citibike.citibike_trips`
+WHERE start_station_name IS NOT NULL
+GROUP BY start_station_name
+ORDER BY nombre_trajets DESC
+LIMIT 100;
+
+
+-- ── REQUÊTE 6 : Durée moyenne par type d'utilisateur ─────
+-- AVG() = calcule la moyenne d'une colonne numérique
+-- tripduration est en secondes → /60 pour obtenir des minutes
+-- ROUND(valeur, 1) = arrondir à 1 décimale
+-- Subscriber = abonné annuel (trajets courts, usage commute)
+-- Customer   = client ponctuel (trajets longs, usage touriste)
+SELECT
+  usertype,
+  ROUND(AVG(tripduration)/60, 1) AS duree_moy_minutes,
+  COUNT(*) AS nombre_trajets
+FROM `bigquery-public-data.new_york_citibike.citibike_trips`
+WHERE
+  tripduration > 0        -- exclure les durées nulles ou négatives
+  AND usertype IS NOT NULL
+GROUP BY usertype
+ORDER BY duree_moy_minutes DESC;
+
+
+-- ── REQUÊTE 7 : Évolution mensuelle des trajets ──────────
+-- EXTRACT() = extraire une partie d'une date
+-- YEAR  = extraire l'année (ex : 2023)
+-- MONTH = extraire le mois (1 à 12)
+-- GROUP BY annee, month = regrouper par année ET mois
+-- Révèle la saisonnalité : plus de trajets en été, moins en hiver
+SELECT
+  EXTRACT(YEAR FROM starttime)  AS annee,
+  EXTRACT(MONTH FROM starttime) AS month,
+  COUNT(*) AS nombre_trajets
+FROM `bigquery-public-data.new_york_citibike.citibike_trips`
+WHERE
+  starttime IS NOT NULL
+GROUP BY annee, month
+ORDER BY annee, month DESC;

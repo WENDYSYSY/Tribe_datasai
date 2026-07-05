@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DataSAI — Commandes BigQuery Jour 4</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  background:#080F1E;
+  color:#F0F4FF;
+  font-family:'DM Sans',sans-serif;
+  min-height:100vh;
+  padding:40px 20px 80px;
+}
+.wrap{max-width:780px;margin:0 auto}
+
+.page-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  margin-bottom:32px;
+  flex-wrap:wrap;
+  gap:16px;
+}
+.page-title h1{
+  font-family:'Syne',sans-serif;
+  font-weight:800;
+  font-size:24px;
+  color:#F8F9FF;
+  margin-bottom:4px;
+}
+.page-title p{
+  color:#6B9FFF;
+  font-size:13px;
+}
+
+.copy-all-btn{
+  background:linear-gradient(135deg,#F5A623,#E8920F);
+  color:#080F1E;
+  border:none;
+  border-radius:10px;
+  padding:12px 22px;
+  font-family:'Syne',sans-serif;
+  font-weight:800;
+  font-size:12px;
+  letter-spacing:0.05em;
+  cursor:pointer;
+  transition:opacity .2s, transform .15s;
+  white-space:nowrap;
+}
+.copy-all-btn:hover{opacity:.85;transform:translateY(-1px)}
+.copy-all-btn.copied{background:linear-gradient(135deg,#22C55E,#16A34A);color:#fff}
+
+.section{
+  background:#0F1D35;
+  border:1px solid rgba(26,79,186,0.25);
+  border-radius:14px;
+  padding:22px 24px;
+  margin-bottom:16px;
+}
+.section.highlight{
+  border-color:rgba(245,166,35,0.35);
+}
+
+.section-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:14px;
+  gap:12px;
+}
+.section-label{
+  font-family:'Syne',sans-serif;
+  font-weight:700;
+  font-size:14px;
+  color:#F8F9FF;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.badge{
+  background:rgba(26,79,186,0.25);
+  border:1px solid rgba(26,79,186,0.5);
+  border-radius:20px;
+  padding:2px 10px;
+  font-size:10px;
+  font-weight:700;
+  color:#6B9FFF;
+  letter-spacing:0.05em;
+  text-transform:uppercase;
+}
+.badge.green{
+  background:rgba(34,197,94,0.15);
+  border-color:rgba(34,197,94,0.4);
+  color:#4ADE80;
+}
+.badge.gold{
+  background:rgba(245,166,35,0.15);
+  border-color:rgba(245,166,35,0.4);
+  color:#FFD166;
+}
+
+.copy-btn{
+  background:rgba(26,79,186,0.3);
+  border:1px solid rgba(26,79,186,0.5);
+  color:#6B9FFF;
+  border-radius:8px;
+  padding:7px 14px;
+  font-family:'Syne',sans-serif;
+  font-weight:700;
+  font-size:11px;
+  letter-spacing:0.04em;
+  cursor:pointer;
+  transition:all .2s;
+  white-space:nowrap;
+}
+.copy-btn:hover{background:rgba(26,79,186,0.5);color:#fff}
+.copy-btn.copied{
+  background:rgba(34,197,94,0.2);
+  border-color:rgba(34,197,94,0.5);
+  color:#4ADE80;
+}
+
+.desc{
+  color:#8A9BC0;
+  font-size:12.5px;
+  margin-bottom:10px;
+  line-height:1.6;
+}
+
+.code{
+  background:#060D1A;
+  border:1px solid rgba(26,79,186,0.2);
+  border-radius:8px;
+  padding:14px 16px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:12.5px;
+  color:#A8D8FF;
+  white-space:pre-wrap;
+  line-height:1.6;
+}
+.code .comment{color:#3D5A8A}
+
+.divider{
+  height:1px;
+  background:rgba(255,255,255,0.06);
+  margin:24px 0;
+}
+
+.order-list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin-top:6px;
+}
+.order-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:13px;
+  color:#C2CFEA;
+}
+.order-num{
+  background:rgba(26,79,186,0.3);
+  border:1px solid rgba(26,79,186,0.5);
+  border-radius:50%;
+  width:24px;
+  height:24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:'Syne',sans-serif;
+  font-weight:700;
+  font-size:11px;
+  color:#6B9FFF;
+  flex-shrink:0;
+}
+
+footer{
+  text-align:center;
+  margin-top:40px;
+  font-size:12px;
+  color:#3D5A8A;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="page-header">
+    <div class="page-title">
+      <h1>☁️ BigQuery — Commandes Jour 4</h1>
+      <p>DataSAI · Semaine Cloud Computing · datasai.fr</p>
+    </div>
+    <button class="copy-all-btn" onclick="copyAll()">📋 Tout copier</button>
+  </div>
+
+  <div id="all-content">
+
+  <!-- ORDRE D'EXÉCUTION -->
+  <div class="section highlight">
+    <div class="section-label">📋 Ordre d'exécution</div>
+    <div class="order-list" style="margin-top:12px">
+      <div class="order-item"><div class="order-num">0</div>Vérifier que Python est installé</div>
+      <div class="order-item"><div class="order-num">1</div>Installer les dépendances Python</div>
+      <div class="order-item"><div class="order-num">2</div>S'authentifier auprès de Google Cloud</div>
+      <div class="order-item"><div class="order-num">3</div>Lancer le script Python</div>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 0 — Python -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-label">
+        <span>🐍 Étape 0 — Vérifier Python</span>
+        <span class="badge">PowerShell</span>
+      </div>
+      <button class="copy-btn" onclick="copyBlock(this,'cmd-0')">Copier</button>
+    </div>
+    <div class="desc">
+      Vérifie que Python est bien installé avant de continuer.<br>
+      Tu dois voir <strong>Python 3.11.x</strong> ou supérieur.
+    </div>
+    <div class="code" id="cmd-0">python --version</div>
+  </div>
+
+  <!-- ÉTAPE 1 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-label">
+        <span>📦 Étape 1 — Installation des dépendances Python</span>
+        <span class="badge">PowerShell</span>
+      </div>
+      <button class="copy-btn" onclick="copyBlock(this,'cmd-1')">Copier</button>
+    </div>
+    <div class="desc">
+      Installe les trois librairies nécessaires en une seule commande.<br>
+      <strong>google-cloud-bigquery</strong> → connexion et requêtes BigQuery<br>
+      <strong>pandas</strong> → afficher les résultats en DataFrame<br>
+      <strong>db-dtypes</strong> → convertir les types BigQuery vers Pandas
+    </div>
+    <div class="code" id="cmd-1">pip install google-cloud-bigquery pandas db-dtypes</div>
+  </div>
+
+  <!-- ÉTAPE 1b — Vérification installation -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-label">
+        <span>✅ Étape 1b — Vérifier l'installation</span>
+        <span class="badge">PowerShell</span>
+      </div>
+      <button class="copy-btn" onclick="copyBlock(this,'cmd-1b')">Copier</button>
+    </div>
+    <div class="desc">
+      Vérifie que les trois librairies sont bien installées.
+    </div>
+    <div class="code" id="cmd-1b">pip show google-cloud-bigquery pandas db-dtypes</div>
+  </div>
+
+  <!-- ÉTAPE 2 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-label">
+        <span>🔐 Étape 2 — Authentification Google Cloud</span>
+        <span class="badge">PowerShell</span>
+      </div>
+      <button class="copy-btn" onclick="copyBlock(this,'cmd-2')">Copier</button>
+    </div>
+    <div class="desc">
+      Connecte les librairies Python à ton compte Google Cloud.<br>
+      <strong>Important :</strong> différent de <code style="color:#6B9FFF">gcloud auth login</code> — celui-ci est pour les librairies Python.
+    </div>
+    <div class="code" id="cmd-2">gcloud auth application-default login --no-browser</div>
+  </div>
+
+  <!-- ÉTAPE 2b -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-label">
+        <span>🔐 Étape 2b — Si erreur de navigateur</span>
+        <span class="badge gold">Optionnel</span>
+      </div>
+      <button class="copy-btn" onclick="copyBlock(this,'cmd-2b')">Copier</button>
+    </div>
+    <div class="desc">
+      Si l'authentification plante avec le navigateur — ouvrir un deuxième terminal
+      et coller la commande longue qui s'affiche dans le premier terminal.
+    </div>
+    <div class="code" id="cmd-2b"><span class="comment"># Dans un DEUXIÈME terminal PowerShell</span>
+<span class="comment"># Coller ici la commande longue affichée dans le premier terminal :</span>
+<span class="comment"># gcloud auth application-default login --remote-bootstrap="https://..."</span></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ÉTAPE 3 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-label">
+        <span>🚀 Étape 3 — Lancer le script Python</span>
+        <span class="badge green">Principal</span>
+      </div>
+      <button class="copy-btn" onclick="copyBlock(this,'cmd-3')">Copier</button>
+    </div>
+    <div class="desc">
+      Exécute les 7 requêtes BigQuery sur les 58 millions de trajets NYC Citi Bike.
+    </div>
+    <div class="code" id="cmd-3">python bigquery_datasai.py</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- COMMANDES UTILES -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-label">
+        <span>🛠️ Commandes utiles</span>
+        <span class="badge">PowerShell</span>
+      </div>
+      <button class="copy-btn" onclick="copyBlock(this,'cmd-4')">Copier</button>
+    </div>
+    <div class="desc">Vérifications et configuration du projet Google Cloud.</div>
+    <div class="code" id="cmd-4"><span class="comment"># Vérifier que l'authentification a marché</span>
+gcloud auth application-default print-access-token
+
+<span class="comment"># Vérifier le projet actif</span>
+gcloud config get-value project
+
+<span class="comment"># Changer de projet si nécessaire</span>
+gcloud config set project gen-lang-client-0080670010</div>
+  </div>
+
+  <!-- TOUTES LES COMMANDES EN UNE BOÎTE -->
+  <div class="section highlight">
+    <div class="section-header">
+      <div class="section-label">
+        <span>📋 Toutes les commandes — dans l'ordre</span>
+        <span class="badge green">Tout en un</span>
+      </div>
+      <button class="copy-btn" onclick="copyBlock(this,'cmd-all')">Copier tout</button>
+    </div>
+    <div class="desc">Toutes les commandes du Jour 4 dans l'ordre d'exécution.</div>
+    <div class="code" id="cmd-all"><span class="comment"># ── Étape 0 : Vérifier Python ─────────────────────────────</span>
+python --version
+
+<span class="comment"># ── Étape 1 : Installer les dépendances Python ────────────</span>
+pip install google-cloud-bigquery pandas db-dtypes
+
+<span class="comment"># ── Étape 1b : Vérifier l'installation ───────────────────</span>
+pip show google-cloud-bigquery pandas db-dtypes
+
+<span class="comment"># ── Étape 2 : Authentification Google Cloud ───────────────</span>
+gcloud auth application-default login --no-browser
+
+<span class="comment"># ── Étape 3 : Lancer le script Python ────────────────────</span>
+python bigquery_datasai.py
+
+<span class="comment"># ── Commandes utiles ──────────────────────────────────────</span>
+<span class="comment"># Vérifier l'authentification</span>
+gcloud auth application-default print-access-token
+
+<span class="comment"># Vérifier le projet actif</span>
+gcloud config get-value project
+
+<span class="comment"># Changer de projet</span>
+gcloud config set project gen-lang-client-0080670010</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- RÉSULTATS -->
+  <div class="section highlight">
+    <div class="section-header">
+      <div class="section-label">
+        <span>📊 Résultats obtenus</span>
+        <span class="badge gold">Jour 4</span>
+      </div>
+    </div>
+    <div class="code"><span class="comment"># Console BigQuery   → 5 secondes pour 7 requêtes</span>
+<span class="comment"># Python (local)     → 10.30 secondes pour 7 requêtes</span>
+<span class="comment"># Dataset            → 58+ millions de trajets NYC Citi Bike</span>
+<span class="comment"># Premier 1 To/mois  → gratuit</span></div>
+  </div>
+
+  </div><!-- end all-content -->
+
+  <footer>datasai.fr — Série Cloud Computing — Semaine 2, Jour 4</footer>
+
+</div>
+
+<script>
+function copyBlock(btn, id) {
+  const text = document.getElementById(id).innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✅ Copié';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = orig;
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+function copyAll() {
+  const text = document.getElementById('all-content').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.copy-all-btn');
+    btn.textContent = '✅ Tout copié !';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = '📋 Tout copier';
+      btn.classList.remove('copied');
+    }, 2500);
+  });
+}
+</script>
+</body>
+</html>
