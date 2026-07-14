@@ -1,0 +1,35 @@
+Voici une capture d'écran d'une interface web [glisser l'image]. Analyse sa
+structure visuelle : mise en page, hiérarchie des sections, palette de
+couleurs, typographie, espacements, et composants interactifs visibles
+(menus, boutons, formulaires, cartes).
+
+Reconstruis une version fonctionnelle et responsive de cette interface en
+HTML/CSS/JavaScript, sans dépendance externe, avec un niveau de finition
+professionnel :
+
+FIDÉLITÉ VISUELLE :
+- Respecte fidèlement la palette de couleurs, la typographie et les
+  proportions de l'image de référence
+- Reproduis la hiérarchie visuelle exacte (ce qui attire l'œil en premier,
+  en second, etc.)
+
+INTERACTIONS ET POLISH :
+- Ajoute des micro-interactions cohérentes avec le style détecté : effet
+  de survol sur les boutons et liens, transition douce sur les éléments
+  cliquables, légère animation d'apparition des sections au défilement
+- Menu de navigation fonctionnel, y compris une version mobile (menu
+  hamburger si la capture suggère un design desktop classique)
+- Formulaires avec validation basique côté client si des champs sont
+  visibles sur la capture
+
+RESPONSIVE ET ACCESSIBILITÉ :
+- Rendu propre et lisible sur mobile, tablette et desktop, avec des points
+  de rupture (breakpoints) cohérents
+- Contrastes de couleurs suffisants pour la lisibilité, textes alternatifs
+  sur les images
+
+Teste toi-même le rendu à plusieurs tailles d'écran (mobile, tablette,
+desktop) et vérifie que les interactions fonctionnent avant de me rendre la
+main. Corrige tout problème d'affichage, de contraste, ou de mise en page
+que tu détectes. Précise-moi, à la fin, les éléments de l'image originale
+que tu n'as pas pu reproduire avec certitude et pourquoi.
